@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">firebaseauth</string>
+    <string name="app_name">AutoMile</string>
+    <array name="categories">
+        <item>"     "</item>
+        <item>Personal</item>
+        <item>Business</item>
+        <item>Medical</item>
+    </array>
+
 </resources>

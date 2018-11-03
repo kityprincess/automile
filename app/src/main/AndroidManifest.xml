@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".CreateProfile" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".GetLocation"></activity>
+        <activity android:name=".GetLocation" />
+        <activity android:name=".CategoriesActivity"></activity>
     </application>
 
 </manifest>

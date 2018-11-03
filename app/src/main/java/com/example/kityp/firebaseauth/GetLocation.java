@@ -2,11 +2,13 @@
 //https://javapapers.com/android/android-location-fused-provider/
 //https://javapapers.com/android/markersgoogle-maps-android-api-v2/
 //https://javapapers.com/android/android-location-tracker-with-google-maps/
+//https://www.androidauthority.com/create-a-gps-tracking-application-with-firebase-realtime-databse-844343/
 
 package com.example.kityp.firebaseauth;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,8 +16,12 @@ import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.kityp.firebaseauth.R;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,6 +29,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
@@ -101,5 +108,31 @@ public class GetLocation extends AppCompatActivity {
                 callPermissions();
             }
         });
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.menuLogout:
+
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                startActivity(new Intent(this, MainActivity.class));
+
+                break;
+        }
+
+        return true;
     }
 }

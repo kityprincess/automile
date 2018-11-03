@@ -20,11 +20,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
     ProgressBar progressBar;
     EditText email_editText, password_editText;
+
+    DatabaseReference databaseProfile;
 
     private FirebaseAuth mAuth;
 
@@ -41,13 +45,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         findViewById(R.id.register_button).setOnClickListener(this);
         findViewById(R.id.login_textView).setOnClickListener(this);
+
+        databaseProfile = FirebaseDatabase.getInstance().getReference("profiles");
     }
 
     private void registerUser() {
+        //TODO remove - for debugging purposes only
         Log.d("Register Activity", "inside register user");
         String email = email_editText.getText().toString().trim();
-//        String email = "a@a.com";
-//        String password = "123456";
         String password = password_editText.getText().toString().trim();
 
         if (email.isEmpty()) {
@@ -62,14 +67,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
 
-        if (password.isEmpty()) {
-            password_editText.setError("Password is required");
-            password_editText.requestFocus();
-            return;
-        }
-
-        if (password.length() < 6) {
-            password_editText.setError("Password must be at least 6 characters");
+        if (password.isEmpty() || password.length() < 6) {
+            password_editText.setError("A password with at least 6 characters is required");
             password_editText.requestFocus();
             return;
         }
@@ -81,9 +80,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
+                    addNewUser();
                     Toast.makeText(getApplicationContext(), "User registered", Toast.LENGTH_SHORT).show();
-//                    startActivity(new Intent(RegisterActivity.this, CreateProfile.class));
-//                    finish();
+                    startActivity(new Intent(RegisterActivity.this, CreateProfile.class));
+                    finish();
                 } else {
 
                     if (task.getException() instanceof FirebaseAuthUserCollisionException) {
@@ -96,7 +96,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
-
     }
 
     @Override
@@ -111,5 +110,28 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 startActivity(new Intent(this, MainActivity.class));
                 break;
         }
+    }
+
+    private void addNewUser() {
+//        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String user_uid = "test";
+        String first_name = "";
+        String last_name = "";
+        Double working_hours = 1.0;
+        String categories = "business";
+        Double pause_time = 10.0;
+        Double mileage_rate = 54.5;
+
+        //TODO remove - for debugging purposes only
+        Log.d("CreateProfile", "addNewUser called");
+
+        Profile profile = new Profile(user_uid, first_name, last_name, working_hours,
+                categories, pause_time, mileage_rate);
+
+        databaseProfile.child("profiles").child(user_uid).setValue(profile);
+
+        //TODO remove - for debugging purposes only
+        Toast.makeText(this, "Profile Created", Toast.LENGTH_SHORT).show();
+
     }
 }

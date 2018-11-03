@@ -24,14 +24,55 @@
         android:layout_height="wrap_content"
         android:hint="Enter Email Address" />
 
-    <TextView
-        android:id="@+id/Verified_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Verified"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Large" />
-
     <!--TODO: Pick a different button-->
+    <Button
+        android:id="@+id/WrkHours_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="55dp"
+        android:paddingRight="55dp"
+        android:text="Working Hours"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/Categories_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="55dp"
+        android:paddingRight="55dp"
+        android:text="Categories"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/PauseTime_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="55dp"
+        android:paddingRight="55dp"
+        android:text="Pause Time"
+        android:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/ScheduleReports_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="25dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="55dp"
+        android:paddingRight="55dp"
+        android:text="Schedule Reports"
+        android:textAllCaps="false" />
+
     <Button
         android:id="@+id/Save_button"
         android:layout_width="wrap_content"

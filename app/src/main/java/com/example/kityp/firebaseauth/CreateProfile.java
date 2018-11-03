@@ -1,4 +1,5 @@
 //https://github.com/probelalkhan/firebase-authentication-tutorial
+//https://www.youtube.com/watch?v=GtxVILjLcw8&feature=youtu.be
 package com.example.kityp.firebaseauth;
 
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,16 +28,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.util.Date;
 
-public class CreateProfile extends AppCompatActivity {
+public class CreateProfile extends AppCompatActivity implements View.OnClickListener {
 
     TextView textView;
     EditText editText;
     ProgressBar progressBar;
-
-    String profileImageUrl;
 
     FirebaseAuth mAuth;
 
@@ -50,7 +53,11 @@ public class CreateProfile extends AppCompatActivity {
 
         editText = (EditText) findViewById(R.id.DisplayName_editText);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
-        textView = (TextView) findViewById(R.id.Verified_textView);
+
+        Button WrkHours_button = findViewById(R.id.WrkHours_button);
+        Button Categories_button = findViewById(R.id.Categories_button);
+        Button PauseTime_button = findViewById(R.id.PauseTime_button);
+        Button ScheduleReports_button = findViewById(R.id.ScheduleReports_button);
 
         loadUserInformation();
 
@@ -60,6 +67,11 @@ public class CreateProfile extends AppCompatActivity {
                 saveUserInformation();
             }
         });
+// TODO: Add hints or instructions to each setting below
+        WrkHours_button.setOnClickListener(this);
+        Categories_button.setOnClickListener(this);
+        PauseTime_button.setOnClickListener(this);
+        ScheduleReports_button.setOnClickListener(this);
     }
 
 
@@ -78,23 +90,6 @@ public class CreateProfile extends AppCompatActivity {
         if (user != null) {
             if (user.getDisplayName() != null) {
                 editText.setText(user.getDisplayName());
-            }
-
-            if (user.isEmailVerified()) {
-                textView.setText("Email Verified");
-            } else {
-                textView.setText("Email Not Verified (Click to Verify)");
-                textView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(CreateProfile.this, "Verification Email Sent", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
             }
         }
     }
@@ -130,6 +125,25 @@ public class CreateProfile extends AppCompatActivity {
     }
 
     @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.WrkHours_button:
+                Toast.makeText(this, "Work Hours Button Clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.Categories_button:
+                Toast.makeText(this, "Categories Button Clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.PauseTime_button:
+                Toast.makeText(this, "Pause Time Button Clicked", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.ScheduleReports_button:
+                Toast.makeText(this, "Schedule Reports Button Clicked", Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         MenuInflater inflater = getMenuInflater();
@@ -153,5 +167,4 @@ public class CreateProfile extends AppCompatActivity {
 
         return true;
     }
-
 }
