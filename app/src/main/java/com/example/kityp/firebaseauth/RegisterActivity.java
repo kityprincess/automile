@@ -1,6 +1,8 @@
 //https://github.com/probelalkhan/firebase-authentication-tutorial
 package com.example.kityp.firebaseauth;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -22,6 +24,10 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
+
+import java.util.ArrayList;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -82,6 +88,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (task.isSuccessful()) {
                     addNewUser();
                     Toast.makeText(getApplicationContext(), "User registered", Toast.LENGTH_SHORT).show();
+                    callPermissions();
                     startActivity(new Intent(RegisterActivity.this, CreateProfile.class));
                     finish();
                 } else {
@@ -113,25 +120,46 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void addNewUser() {
-//        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String user_uid = "test";
+        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         String first_name = "";
         String last_name = "";
         Double working_hours = 1.0;
-        String categories = "business";
+        String categories = "Business";
         Double pause_time = 10.0;
         Double mileage_rate = 54.5;
 
         //TODO remove - for debugging purposes only
-        Log.d("CreateProfile", "addNewUser called");
+        Log.d("addNewUser", "addNewUser called");
+        Toast.makeText(this, "addNewUser called", Toast.LENGTH_SHORT).show();
 
         Profile profile = new Profile(user_uid, first_name, last_name, working_hours,
                 categories, pause_time, mileage_rate);
 
-        databaseProfile.child("profiles").child(user_uid).setValue(profile);
+        databaseProfile.child(user_uid).setValue(profile);
 
         //TODO remove - for debugging purposes only
         Toast.makeText(this, "Profile Created", Toast.LENGTH_SHORT).show();
 
+    }
+
+    public void callPermissions() {
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        String rationale = "Please provide location permission to allow AutoMile to track your mileage.";
+        Permissions.Options options = new Permissions.Options()
+                .setRationaleDialogTitle("Info")
+                .setSettingsDialogTitle("Warning");
+
+        Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                Log.e("permission", "permission granted");
+            }
+
+            @Override
+            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                super.onDenied(context, deniedPermissions);
+                Log.e("permission", "permission denied");
+            }
+        });
     }
 }

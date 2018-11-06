@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">AutoMile</string>
     <array name="categories">
-        <item>"     "</item>
+        <item>" "</item>
         <item>Personal</item>
         <item>Business</item>
         <item>Medical</item>
+    </array>
+    <array name="genres">
+        <item>"Rock"</item>
+        <item>"Country</item>
+        <item>"80's"</item>
     </array>
 
 </resources>

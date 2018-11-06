@@ -2,10 +2,13 @@
 
 package com.example.kityp.firebaseauth;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
@@ -17,6 +20,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -76,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
                     finish();
+                    callPermissions();
                     Intent intent = new Intent(MainActivity.this, CreateProfile.class);
-//                    Intent intent = new Intent(MainActivity.this, GetLocation.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
@@ -93,8 +100,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (mAuth.getCurrentUser() != null) {
             finish();
+            //TODO restore startActivity(new Intent(this, CreateProfile.class)) after testing artist DB
+            //startActivity(new Intent(this, TestArtist.class));
+            startGPSTracking();
             startActivity(new Intent(this, CreateProfile.class));
-            //startActivity(new Intent(this, GetLocation.class));
         }
     }
 
@@ -110,5 +119,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 userLogin();
                 break;
         }
+    }
+
+    public void callPermissions() {
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        String rationale = "Please provide location permission to allow AutoMile to track your mileage.";
+        Permissions.Options options = new Permissions.Options()
+                .setRationaleDialogTitle("Info")
+                .setSettingsDialogTitle("Warning");
+
+        Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                Log.e("permission", "permission granted");
+            }
+
+            @Override
+            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                super.onDenied(context, deniedPermissions);
+                Log.e("permission", "permission denied");
+            }
+        });
+    }
+
+    private void startGPSTracking() {
+        startService(new Intent(this, GPSTracking.class));
     }
 }
