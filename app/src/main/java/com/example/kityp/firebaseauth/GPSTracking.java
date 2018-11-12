@@ -69,7 +69,7 @@ public class GPSTracking extends Service {
             fusedLocationProviderClient = new FusedLocationProviderClient(this);
             locationRequest = new LocationRequest();
 
-            Log.e("permission", "in if statement");
+            Log.e("GPSTracking", "requesting permission");
 
             // TODO: get pause time from Firebase and use for setInterval
             // Time in miliseconds
@@ -98,7 +98,7 @@ public class GPSTracking extends Service {
 
     public void callPermissions() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-        String rationale = "Please provide location permission to allow AutoMile to track your mileage.";
+        String rationale = "GPS Tracking - Please provide location permission to allow AutoMile to track your mileage.";
         Permissions.Options options = new Permissions.Options()
                 .setRationaleDialogTitle("Info")
                 .setSettingsDialogTitle("Warning");
@@ -107,7 +107,7 @@ public class GPSTracking extends Service {
             @Override
             public void onGranted() {
                 requestLocationUpdates();
-                Log.e("permission", "permission granted");
+                Log.e("gpstracking", "permission granted");
             }
 
             @Override

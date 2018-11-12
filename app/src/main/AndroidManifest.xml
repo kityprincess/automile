@@ -23,6 +23,7 @@
         <activity android:name=".CreateProfile" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".CategoriesActivity" />
+        <activity android:name=".PauseTimeActivity" />
 
         <service
             android:name=".GPSTracking"

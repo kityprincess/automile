@@ -6,6 +6,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -77,14 +79,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         progressBar.setVisibility(View.VISIBLE);
 
+
+
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
+                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED &&
+                            ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
+                        Log.d("Main Activity", "checking permissions");
+                    } else callPermissions();
                     finish();
-                    callPermissions();
-                    Intent intent = new Intent(MainActivity.this, CreateProfile.class);
+                    //Intent intent = new Intent(MainActivity.this, CreateProfile.class);
+                    Intent intent = new Intent(MainActivity.this, Home.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
@@ -99,11 +107,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStart();
 
         if (mAuth.getCurrentUser() != null) {
-            finish();
-            //TODO restore startActivity(new Intent(this, CreateProfile.class)) after testing artist DB
-            //startActivity(new Intent(this, TestArtist.class));
-            startGPSTracking();
-            startActivity(new Intent(this, CreateProfile.class));
+                finish();
+                startGPSTracking();
+                //Intent intent = new Intent(MainActivity.this, CreateProfile.class);
+                Intent intent = new Intent(MainActivity.this, Home.class);
         }
     }
 
@@ -131,13 +138,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
             @Override
             public void onGranted() {
-                Log.e("permission", "permission granted");
+                Log.e("main activity", "permission granted");
             }
 
             @Override
             public void onDenied(Context context, ArrayList<String> deniedPermissions) {
                 super.onDenied(context, deniedPermissions);
-                Log.e("permission", "permission denied");
+                Log.e("main activity", "permission denied");
             }
         });
     }

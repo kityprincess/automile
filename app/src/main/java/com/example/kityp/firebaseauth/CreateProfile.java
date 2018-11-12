@@ -131,10 +131,12 @@ public class CreateProfile extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(this, "Work Hours Button Clicked", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.Categories_button:
-                Toast.makeText(this, "Categories Button Clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Go To Categories Activity", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, CategoriesActivity.class));
                 break;
             case R.id.PauseTime_button:
-                Toast.makeText(this, "Pause Time Button Clicked", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Pause Time Button Clicked", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, PauseTimeActivity.class));
                 break;
             case R.id.ScheduleReports_button:
                 Toast.makeText(this, "Schedule Reports Button Clicked", Toast.LENGTH_SHORT).show();
@@ -156,12 +158,13 @@ public class CreateProfile extends AppCompatActivity implements View.OnClickList
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.menuProfile:
+                Intent intent = new Intent(this, CreateProfile.class);
+                break;
             case R.id.menuLogout:
-
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 startActivity(new Intent(this, MainActivity.class));
-
                 break;
         }
 

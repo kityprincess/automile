@@ -31,27 +31,18 @@
                 android:layout_height="wrap_content"
                 android:background="@color/colorPrimary" />
 
-            <Spinner
-                android:id="@+id/categories_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:entries="@array/categories"
-                android:fontFamily="casual"
-                android:paddingBottom="15dp"
-                android:visibility="visible" />
-
             <TextView
-                android:id="@+id/categories_textView"
+                android:id="@+id/pauseTime_textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Show me the Categories!" />
+                android:hint="Show me the Pause Time!" />
 
             <EditText
-                android:id="@+id/category_editText"
+                android:id="@+id/pauseTime_editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="casual"
-                android:hint="Insert Custom Category"
+                android:hint="Insert new Pause Time"
                 android:inputType="text"
                 android:paddingBottom="15dp"
                 android:textColorHint="@color/colorAccent" />
@@ -59,13 +50,13 @@
 
             <!--TODO: Pick a different button-->
             <Button
-                android:id="@+id/addCategory_button"
+                android:id="@+id/updatePauseTime_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="7dp"
                 android:background="@color/colorPrimaryDark"
-                android:text="Add Category"
+                android:text="Update Pause Time"
                 android:textAllCaps="false"
                 android:textColor="@color/colorAccent" />
 

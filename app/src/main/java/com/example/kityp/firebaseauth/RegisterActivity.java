@@ -121,8 +121,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private void addNewUser() {
         String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String first_name = "";
-        String last_name = "";
+        String first_name = null;
+        String last_name = null;
         Double working_hours = 1.0;
         String categories = "Business";
         Double pause_time = 10.0;
@@ -130,21 +130,27 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         //TODO remove - for debugging purposes only
         Log.d("addNewUser", "addNewUser called");
-        Toast.makeText(this, "addNewUser called", Toast.LENGTH_SHORT).show();
 
         Profile profile = new Profile(user_uid, first_name, last_name, working_hours,
                 categories, pause_time, mileage_rate);
 
-        databaseProfile.child(user_uid).setValue(profile);
+        databaseProfile.child(user_uid).setValue(profile).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Profile Created", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Problem Creating Profile", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-        //TODO remove - for debugging purposes only
-        Toast.makeText(this, "Profile Created", Toast.LENGTH_SHORT).show();
 
     }
 
     public void callPermissions() {
         String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-        String rationale = "Please provide location permission to allow AutoMile to track your mileage.";
+        String rationale = "Register Activity - Please provide location permission to allow AutoMile to track your mileage.";
         Permissions.Options options = new Permissions.Options()
                 .setRationaleDialogTitle("Info")
                 .setSettingsDialogTitle("Warning");
@@ -152,13 +158,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
             @Override
             public void onGranted() {
-                Log.e("permission", "permission granted");
+                Log.e("register activity", "permission granted");
             }
 
             @Override
             public void onDenied(Context context, ArrayList<String> deniedPermissions) {
                 super.onDenied(context, deniedPermissions);
-                Log.e("permission", "permission denied");
+                Log.e("register activity", "permission denied");
             }
         });
     }

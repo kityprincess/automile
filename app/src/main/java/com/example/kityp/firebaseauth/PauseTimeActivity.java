@@ -2,9 +2,9 @@
 package com.example.kityp.firebaseauth;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -19,7 +19,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.internal.Objects;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -29,42 +28,37 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.Map;
-
-public class CategoriesActivity extends AppCompatActivity {
+public class PauseTimeActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
-    EditText category_editText;
-    Button addCategory_button;
-    Spinner categories_spinner;
-    TextView categories_textView;
+    EditText pauseTime_editText;
+    Button updatePauseTime_button;
+    TextView pauseTime_textView;
 
     private DatabaseReference databaseProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories);
+        setContentView(R.layout.activity_pause_time);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
 
         String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         databaseProfile = FirebaseDatabase.getInstance().getReference("profiles")
-                .child(user_uid).child("categories");
+                .child(user_uid).child("pause_time");
 
-        category_editText = (EditText) findViewById(R.id.category_editText);
-        addCategory_button = (Button) findViewById(R.id.addCategory_button);
-        categories_spinner = (Spinner) findViewById(R.id.categories_spinner);
-        categories_textView = (TextView) findViewById(R.id.categories_textView);
+        pauseTime_editText = (EditText) findViewById(R.id.pauseTime_editText);
+        updatePauseTime_button = (Button) findViewById(R.id.updatePauseTime_button);
+        pauseTime_textView = (TextView) findViewById(R.id.pauseTime_textView);
 
         databaseProfile.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String categories = dataSnapshot.getValue().toString();
-                Log.d("EventListener", categories);
-                //TODO use spinner instead of  textView to display categories (and allow delete)
-                categories_textView.setText(categories);
+                String pauseTime = dataSnapshot.getValue().toString();
+                Log.d("EventListener", "Pause Time");
+                pauseTime_textView.setText("Pause Time: " + pauseTime);
             }
 
             @Override
@@ -73,27 +67,28 @@ public class CategoriesActivity extends AppCompatActivity {
             }
         });
 
-        addCategory_button.setOnClickListener(new View.OnClickListener() {
+        updatePauseTime_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addCategory();
+                updatePauseTime();
             }
         });
     }
 
-    private void addCategory() {
-        String newCategory = category_editText.getText().toString().trim();
+    private void updatePauseTime() {
+        String newPauseTime = pauseTime_editText.getText().toString().trim();
 
-        if(!TextUtils.isEmpty(newCategory)) {
-            databaseProfile.child("categories").push().setValue(newCategory).addOnCompleteListener(new OnCompleteListener<Void>() {
+        if(!TextUtils.isEmpty(newPauseTime)) {
+            databaseProfile.setValue(newPauseTime).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        Toast.makeText(CategoriesActivity.this, "Category added", Toast.LENGTH_SHORT).show();
+                        //TODO Clear the field
+                        Toast.makeText(PauseTimeActivity.this, "Pause Time Updated", Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(CategoriesActivity.this, "Error saving category", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PauseTimeActivity.this, "Error updating Pause Time", Toast.LENGTH_SHORT).show();
                     }
-                    }
+                }
             });
         }else {
             Toast.makeText(this, "Please enter a new category.", Toast.LENGTH_SHORT).show();
