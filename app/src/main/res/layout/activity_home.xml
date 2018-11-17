@@ -13,10 +13,16 @@
         android:background="@color/colorPrimary" />
 
     <Button
-        android:id="@+id/test_button"
+        android:id="@+id/start_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="I am a test" />
+        android:text="Start Trip" />
+
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop Trip" />
 
     <TextView
         android:id="@+id/textView"

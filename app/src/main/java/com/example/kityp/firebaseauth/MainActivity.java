@@ -10,6 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     FirebaseAuth mAuth;
+    FirebaseAuth.AuthStateListener mAuthListener;
     EditText email_editText, password_editText;
     ProgressBar progressBar;
 
@@ -39,6 +41,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    //Intent User Account
+                }
+            }
+        };
 
         email_editText = (EditText) findViewById(R.id.email_editText);
         password_editText = (EditText) findViewById(R.id.password_editText);
@@ -46,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         findViewById(R.id.register_textView).setOnClickListener(this);
         findViewById(R.id.login_button).setOnClickListener(this);
-
     }
 
     private void userLogin() {
@@ -79,23 +88,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         progressBar.setVisibility(View.VISIBLE);
 
-
-
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 progressBar.setVisibility(View.GONE);
                 if (task.isSuccessful()) {
-                    if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED &&
-                            ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
-                        Log.d("Main Activity", "checking permissions");
-                    } else callPermissions();
+                    Log.e("Main Activity", " signInWithEmailAndPassword - task succesful");
                     finish();
                     //Intent intent = new Intent(MainActivity.this, CreateProfile.class);
                     Intent intent = new Intent(MainActivity.this, Home.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
+                    Log.e("Main Activity", " signInWithEmailAndPassword - task unsuccesful");
                     Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -106,10 +111,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onStart() {
         super.onStart();
 
+        mAuth.addAuthStateListener(mAuthListener);
+
         if (mAuth.getCurrentUser() != null) {
-                finish();
-                startGPSTracking();
-                //Intent intent = new Intent(MainActivity.this, CreateProfile.class);
                 Intent intent = new Intent(MainActivity.this, Home.class);
         }
     }
@@ -126,30 +130,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 userLogin();
                 break;
         }
-    }
-
-    public void callPermissions() {
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-        String rationale = "Please provide location permission to allow AutoMile to track your mileage.";
-        Permissions.Options options = new Permissions.Options()
-                .setRationaleDialogTitle("Info")
-                .setSettingsDialogTitle("Warning");
-
-        Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
-            @Override
-            public void onGranted() {
-                Log.e("main activity", "permission granted");
-            }
-
-            @Override
-            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
-                super.onDenied(context, deniedPermissions);
-                Log.e("main activity", "permission denied");
-            }
-        });
-    }
-
-    private void startGPSTracking() {
-        startService(new Intent(this, GPSTracking.class));
     }
 }

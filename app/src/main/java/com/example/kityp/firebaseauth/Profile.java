@@ -4,20 +4,19 @@ import java.sql.Time;
 import java.util.Date;
 
 public class Profile {
-    //TODO retrieve user_uid from authentication DB
     String user_uid;
     String first_name;
     String  last_name;
     Double working_hours;
     String categories;
-    Double pause_time;
+    String pause_time;
     Double mileage_rate;
 
     public Profile() {
 
     }
 
-    public Profile(String user_uid, String first_name, String last_name, Double working_hours, String categories, Double pause_time, Double mileage_rate) {
+    public Profile(String user_uid, String first_name, String last_name, Double working_hours, String categories, String pause_time, Double mileage_rate) {
         this.user_uid = user_uid;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -47,7 +46,7 @@ public class Profile {
         return categories;
     }
 
-    public Double getPause_time() {
+    public String getPause_time() {
         return pause_time;
     }
 

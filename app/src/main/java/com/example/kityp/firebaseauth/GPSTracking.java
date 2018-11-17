@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
@@ -21,8 +22,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
@@ -31,6 +35,10 @@ import java.util.ArrayList;
 public class GPSTracking extends Service {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
+
+    String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    String pauseTime;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -63,6 +71,9 @@ public class GPSTracking extends Service {
     }
 
     private void requestLocationUpdates() {
+        DatabaseReference databaseProfile = FirebaseDatabase.getInstance().getReference("profiles")
+                .child(user_uid).child("pause_time");
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
             //TODO: SetInterval equal to pause time
@@ -71,21 +82,44 @@ public class GPSTracking extends Service {
 
             Log.e("GPSTracking", "requesting permission");
 
-            // TODO: get pause time from Firebase and use for setInterval
+            databaseProfile.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    pauseTime = dataSnapshot.getValue().toString();
+                    Log.e("GPS EventListener", "Pause Time: " + pauseTime);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
             // Time in miliseconds
+            Log.e("outside EventListener", "Pause Time:" + pauseTime + ".");
+            //log above will display number, line below displays error:
+            // java.lang.RuntimeException: Unable to create service com.example.kityp.firebaseauth.GPSTracking: java.lang.NumberFormatException: null
+            //long msPauseTime = Long.parseLong(pauseTime);
+            //msPauseTime *= 60000;
+            //Log.e("GPS EventListener", "MilliPause Time: " + msPauseTime);
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setFastestInterval(2000);
-            locationRequest.setInterval(5000);
+            locationRequest.setFastestInterval(120000);
+            locationRequest.setInterval(120000);
 
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
 
-                    DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps");
-                    Location location = locationResult.getLastLocation();
-                    if (location != null) {
-                        databaseGPS.setValue(location);
+                    DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps").child(user_uid);
+
+                    Double latitude = locationResult.getLastLocation().getLatitude();
+                    Double longitutde = locationResult.getLastLocation().getLongitude();
+                    Long time = locationResult.getLastLocation().getTime();
+
+                    if (latitude != null && longitutde != null) {
+                        databaseGPS.child("start_lat").setValue(latitude);
+                        databaseGPS.child("start_long").setValue(longitutde);
+                        databaseGPS.child("start_time").setValue(time);
                     }
 
                     //TODO Remove - debugging only

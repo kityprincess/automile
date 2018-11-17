@@ -3,6 +3,7 @@ package com.example.kityp.firebaseauth;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -12,8 +13,10 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -23,12 +26,14 @@ import com.google.android.gms.common.internal.Objects;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class CategoriesActivity extends AppCompatActivity {
@@ -37,9 +42,11 @@ public class CategoriesActivity extends AppCompatActivity {
     EditText category_editText;
     Button addCategory_button;
     Spinner categories_spinner;
-    TextView categories_textView;
+    ListView categories_listView;
 
     private DatabaseReference databaseProfile;
+    private ArrayList<String> existingCategories = new ArrayList<>();
+    private ArrayList<String> categoriesKeys = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +63,45 @@ public class CategoriesActivity extends AppCompatActivity {
         category_editText = (EditText) findViewById(R.id.category_editText);
         addCategory_button = (Button) findViewById(R.id.addCategory_button);
         categories_spinner = (Spinner) findViewById(R.id.categories_spinner);
-        categories_textView = (TextView) findViewById(R.id.categories_textView);
+        categories_listView = (ListView) findViewById(R.id.categories_listView);
 
-        databaseProfile.addValueEventListener(new ValueEventListener() {
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, existingCategories);
+
+        categories_listView.setAdapter(arrayAdapter);
+
+        databaseProfile.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String categories = dataSnapshot.getValue().toString();
-                Log.d("EventListener", categories);
-                //TODO use spinner instead of  textView to display categories (and allow delete)
-                categories_textView.setText(categories);
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                String category = dataSnapshot.getValue(String.class);
+                existingCategories.add(category);
+
+                String key = dataSnapshot.getKey();
+                categoriesKeys.add(key);
+
+                arrayAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                String category = dataSnapshot.getValue(String.class);
+                String key = dataSnapshot.getKey();
+
+                int index = categoriesKeys.indexOf(key);
+
+                existingCategories.set(index, category);
+
+                arrayAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
             }
 
             @Override
@@ -72,6 +109,21 @@ public class CategoriesActivity extends AppCompatActivity {
 
             }
         });
+
+//        databaseProfile.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                String categories = dataSnapshot.getValue().toString();
+//                Log.d("EventListener", categories);
+//                //TODO use spinner instead of  textView to display categories (and allow delete)
+//                categories_textView.setText(categories);
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
 
         addCategory_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +137,7 @@ public class CategoriesActivity extends AppCompatActivity {
         String newCategory = category_editText.getText().toString().trim();
 
         if(!TextUtils.isEmpty(newCategory)) {
-            databaseProfile.child("categories").push().setValue(newCategory).addOnCompleteListener(new OnCompleteListener<Void>() {
+            databaseProfile.push().setValue(newCategory).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
