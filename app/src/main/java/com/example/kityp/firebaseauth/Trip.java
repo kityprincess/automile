@@ -5,38 +5,39 @@ import java.util.Date;
 import java.util.function.DoubleToLongFunction;
 
 public class Trip {
-    String user_uid;
-    Long start_time;
-    Long end_time;
-    Long duration;
-    Double start_lat;
-    Double start_long;
-    Double end_lat;
-    Double end_long;
-    String categories;
-    Double miles;
-    Double cost;
+    private String key;
+    private Long start_time;
+    private Long end_time;
+    private Long duration;
+    private Double start_lat;
+    private Double start_long;
+    private Double end_lat;
+    private Double end_long;
+    private String categories;
+    private Double miles;
+    private Double cost;
 
     public Trip() {
 
     }
 
-    public Trip(String user_uid, Long start_time, Long end_time, Long duration, Double start_lat, Double start_long, Double end_lat, Double end_long, String categories, Double miles, Double cost) {
-        this.user_uid = user_uid;
-        this.start_time = start_time;
-        this.end_time = end_time;
-        this.duration = duration;
-        this.start_lat = start_lat;
-        this.start_long = start_long;
-        this.end_lat = end_lat;
-        this.end_long = end_long;
-        this.categories = categories;
-        this.miles = miles;
+    public Trip(Double cost) {
+        this.key = "";
+        this.start_time = 0L;
+        this.end_time = 0L;
+        this.duration = 0L;
+        this.start_lat = 0.0;
+        this.start_long = 0.0;
+        this.end_lat = 0.0;
+        this.end_long = 0.0;
+        this.categories = "";
+        this.miles = 0.0;
         this.cost = cost;
     }
 
-    public String getUser_uid() {
-        return user_uid;
+    //getters
+    public String getKey() {
+        return key;
     }
 
     public Long getStart_time() {
@@ -77,5 +78,51 @@ public class Trip {
 
     public Double getCost() {
         return cost;
+    }
+
+
+    //setters
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setStart_time(Long start_time) {
+        this.start_time = start_time;
+    }
+
+    public void setEnd_time(Long end_time) {
+        this.end_time = end_time;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
+
+    public void setStart_lat(Double start_lat) {
+        this.start_lat = start_lat;
+    }
+
+    public void setStart_long(Double start_long) {
+        this.start_long = start_long;
+    }
+
+    public void setEnd_lat(Double end_lat) {
+        this.end_lat = end_lat;
+    }
+
+    public void setEnd_long(Double end_long) {
+        this.end_long = end_long;
+    }
+
+    public void setCategories(String categories) {
+        this.categories = categories;
+    }
+
+    public void setMiles(Double miles) {
+        this.miles = miles;
+    }
+
+    public void setCost(Double cost) {
+        this.cost = cost;
     }
 }

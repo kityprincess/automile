@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -32,13 +33,28 @@ import com.nabinbhandari.android.permissions.Permissions;
 
 import java.util.ArrayList;
 
+import static android.app.PendingIntent.getActivity;
+import static android.content.Intent.getIntent;
+
 public class GPSTracking extends Service {
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
 
-    String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//    Intent intent = getIntent();
 
-    String pauseTime;
+    String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps").child(user_uid);
+
+    String key = null;
+    Double curLat = null;
+    Double curLong = null;
+    Long curTime = null;
+    Double startLat = null;
+    Double startLong = null;
+    Long startTime = null;
+    Double endLat = null;
+    Double endLong = null;
+    Long endTime = null;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -48,7 +64,6 @@ public class GPSTracking extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        loginToFirebase();
         callPermissions();
     }
 
@@ -62,7 +77,7 @@ public class GPSTracking extends Service {
             @Override
             public void onComplete(Task<AuthResult>task) {
                 if (task.isSuccessful()) {
-                    requestLocationUpdates();
+                    addNewTrip();
                 } else {
                     Log.d("GPS Service", "Firebase Authentication failed");
                 }
@@ -70,10 +85,34 @@ public class GPSTracking extends Service {
         });
     }
 
-    private void requestLocationUpdates() {
-        DatabaseReference databaseProfile = FirebaseDatabase.getInstance().getReference("profiles")
-                .child(user_uid).child("pause_time");
 
+    private void addNewTrip() {
+        //TODO: all default values should be mull except uid
+        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Double cost = 54.5;
+
+        //TODO remove - for debugging purposes only
+        Log.e("GPSTracking Activity", "addNewTrip called");
+
+        Trip trip = new Trip(cost);
+
+
+        databaseGPS.push().setValue(trip).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    key = databaseGPS.push().getKey();
+                    Toast.makeText(GPSTracking.this, "Trip Started", Toast.LENGTH_SHORT).show();
+                    requestLocationUpdates();
+
+                } else {
+                    Toast.makeText(GPSTracking.this, "Problem Starting Trip", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private void requestLocationUpdates() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
             //TODO: SetInterval equal to pause time
@@ -82,11 +121,22 @@ public class GPSTracking extends Service {
 
             Log.e("GPSTracking", "requesting permission");
 
-            databaseProfile.addValueEventListener(new ValueEventListener() {
+            //60000 milliseconds = 1 second
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            locationRequest.setFastestInterval(60000);
+            locationRequest.setInterval(60000);
+
+            databaseGPS.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    pauseTime = dataSnapshot.getValue().toString();
-                    Log.e("GPS EventListener", "Pause Time: " + pauseTime);
+
+                    startLat = dataSnapshot.child(key).child("start_lat").getValue(Double.class);
+
+                    Log.e("Location", "Listener Starting Latitude: " + startLat);
+                    Log.e("Location", "Listener Starting Longitude: " + startLong);
+                    Log.e("Location", "Listener Current Latitude: " + curLat);
+                    Log.e("Location", "Listener Current Longitutde: " + curLong);
+                    Log.e("Location", "Listener Current Time: " + curTime);
                 }
 
                 @Override
@@ -94,37 +144,43 @@ public class GPSTracking extends Service {
 
                 }
             });
-            // Time in miliseconds
-            Log.e("outside EventListener", "Pause Time:" + pauseTime + ".");
-            //log above will display number, line below displays error:
-            // java.lang.RuntimeException: Unable to create service com.example.kityp.firebaseauth.GPSTracking: java.lang.NumberFormatException: null
-            //long msPauseTime = Long.parseLong(pauseTime);
-            //msPauseTime *= 60000;
-            //Log.e("GPS EventListener", "MilliPause Time: " + msPauseTime);
-            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            locationRequest.setFastestInterval(120000);
-            locationRequest.setInterval(120000);
 
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
                     super.onLocationResult(locationResult);
 
-                    DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps").child(user_uid);
+                    curLat = locationResult.getLastLocation().getLatitude();
+                    curLong = locationResult.getLastLocation().getLongitude();
+                    curTime = locationResult.getLastLocation().getTime();
 
-                    Double latitude = locationResult.getLastLocation().getLatitude();
-                    Double longitutde = locationResult.getLastLocation().getLongitude();
-                    Long time = locationResult.getLastLocation().getTime();
+                    Log.e("Location", "locationResult Starting Latitude: " + startLat);
+                    Log.e("Location", "locationResult Starting Longitude: " + startLong);
+                    Log.e("Location", "locationResult Current Latitude: " + curLat);
+                    Log.e("Location", "locationResult Current Longitutde: " + curLong);
 
-                    if (latitude != null && longitutde != null) {
-                        databaseGPS.child("start_lat").setValue(latitude);
-                        databaseGPS.child("start_long").setValue(longitutde);
-                        databaseGPS.child("start_time").setValue(time);
+                    //TODO at starting Longitude after figuring out why it's taking a value too early
+                    if (curLat != null && curLong != null && startLat == null) {
+                        Log.e("Location", "Are we even making it through the ifs ands buts");
+                        databaseGPS.child(key).child("start_lat").setValue(startLat);
+                        databaseGPS.child(key).child("start_long").setValue(startLong);
+                        databaseGPS.child(key).child("start_time").setValue(startTime);
+                        databaseGPS.child(key).child("end_lat").setValue(endLat);
+                        databaseGPS.child(key).child("end_long").setValue(endLong);
+                        databaseGPS.child(key).child("end_time").setValue(endTime);
+                        startLat = curLat;
+                        startLong = curLong ;
+                        startTime = curTime;
+
+                        Log.e("Location", "First write Starting Latitude: " + startLat);
+                        Log.e("Location", "First write Starting Longitutde: " + startLong);
+                        Log.e("Location", "First write Current Latitude: " + curLat);
+                        Log.e("Location", "First write Current Longitutde: " + curLong);
+                        Log.e("Location", "First write Current Time: " + curTime);
                     }
 
                     //TODO Remove - debugging only
                     Log.d("GPS Tracking", "in requestLocationUpdates");
-                    Log.d("CurrentLocation", "Lat: "+locationResult.getLastLocation().getLatitude() + "Long: "+locationResult.getLastLocation().getLongitude());
                 }
             }, getMainLooper());
         } else callPermissions();
@@ -140,7 +196,7 @@ public class GPSTracking extends Service {
         Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
             @Override
             public void onGranted() {
-                requestLocationUpdates();
+                loginToFirebase();
                 Log.e("gpstracking", "permission granted");
             }
 
