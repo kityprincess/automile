@@ -56,8 +56,7 @@ public class PauseTimeActivity extends AppCompatActivity {
         databaseProfile.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String pauseTime = dataSnapshot.getValue().toString();
-                Log.d("EventListener", "Pause Time");
+                int pauseTime = dataSnapshot.getValue(int.class);
                 pauseTime_textView.setText("Pause Time: " + pauseTime);
             }
 
@@ -76,9 +75,9 @@ public class PauseTimeActivity extends AppCompatActivity {
     }
 
     private void updatePauseTime() {
-        String newPauseTime = pauseTime_editText.getText().toString().trim();
+        int newPauseTime = Integer.parseInt(pauseTime_editText.getText().toString().trim());
 
-        if(!TextUtils.isEmpty(newPauseTime)) {
+        if(newPauseTime != 0) {
             databaseProfile.setValue(newPauseTime).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -117,8 +116,6 @@ public class PauseTimeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MainActivity.class));
                 break;
         }
-
         return true;
     }
-
 }

@@ -5,21 +5,21 @@ import java.util.Date;
 
 public class Profile {
     String user_uid;
-    String first_name;
-    String  last_name;
-    Double working_hours;
+    String display_name;
+    String emailAddress;
+    double working_hours;
     String categories;
-    String pause_time;
-    Double mileage_rate;
+    int pause_time;
+    double mileage_rate;
 
     public Profile() {
 
     }
 
-    public Profile(String user_uid, String first_name, String last_name, Double working_hours, String categories, String pause_time, Double mileage_rate) {
+    public Profile(String user_uid, String display_name, String emailAddress, double working_hours, String categories, int pause_time, double mileage_rate) {
         this.user_uid = user_uid;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.display_name = display_name;
+        this.emailAddress = emailAddress;
         this.working_hours = working_hours;
         this.categories = categories;
         this.pause_time = pause_time;
@@ -30,12 +30,12 @@ public class Profile {
         return user_uid;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getDisplay_name() {
+        return display_name;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
     public Double getWorking_hours() {
@@ -46,7 +46,7 @@ public class Profile {
         return categories;
     }
 
-    public String getPause_time() {
+    public Integer getPause_time() {
         return pause_time;
     }
 

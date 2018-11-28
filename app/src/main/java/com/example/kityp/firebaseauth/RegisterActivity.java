@@ -125,7 +125,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         String last_name = null;
         Double working_hours = 1.0;
         String categories = "Business";
-        String pause_time = "10";
+        Integer pause_time = 10;
         Double mileage_rate = 54.5;
 
         //TODO remove - for debugging purposes only

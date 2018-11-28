@@ -13,20 +13,20 @@
         android:background="@color/colorPrimary" />
 
     <EditText
-        android:id="@+id/DisplayName_editText"
+        android:id="@+id/displayName_editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Display Name" />
 
     <EditText
-        android:id="@+id/EmailAdress_editText"
+        android:id="@+id/emailAddress_editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Email Address" />
 
     <!--TODO: Pick a different button-->
     <Button
-        android:id="@+id/WrkHours_button"
+        android:id="@+id/wrkHours_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -38,7 +38,7 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/Categories_button"
+        android:id="@+id/categories_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -50,7 +50,7 @@
         android:textAllCaps="false" />
 
     <Button
-        android:id="@+id/PauseTime_button"
+        android:id="@+id/pauseTime_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -61,20 +61,20 @@
         android:text="Pause Time"
         android:textAllCaps="false" />
 
-    <Button
-        android:id="@+id/ScheduleReports_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
-        android:paddingLeft="55dp"
-        android:paddingRight="55dp"
-        android:text="Schedule Reports"
-        android:textAllCaps="false" />
+    <!--<Button-->
+        <!--android:id="@+id/scheduleReports_button"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_marginTop="25dp"-->
+        <!--android:background="@color/colorPrimary"-->
+        <!--android:paddingLeft="55dp"-->
+        <!--android:paddingRight="55dp"-->
+        <!--android:text="Schedule Reports"-->
+        <!--android:textAllCaps="false" />-->
 
     <Button
-        android:id="@+id/Save_button"
+        android:id="@+id/save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -6,22 +6,22 @@ import java.util.function.DoubleToLongFunction;
 
 public class Trip {
     private String key;
-    private Long start_time;
-    private Long end_time;
-    private Long duration;
-    private Double start_lat;
-    private Double start_long;
-    private Double end_lat;
-    private Double end_long;
+    private long start_time;
+    private long end_time;
+    private long duration;
+    private double start_lat;
+    private double start_long;
+    private double end_lat;
+    private double end_long;
     private String categories;
-    private Double miles;
-    private Double cost;
+    private double miles;
+    private double cost;
 
     public Trip() {
 
     }
 
-    public Trip(Double cost) {
+    public Trip(double cost) {
         this.key = "";
         this.start_time = 0L;
         this.end_time = 0L;
@@ -86,31 +86,31 @@ public class Trip {
         this.key = key;
     }
 
-    public void setStart_time(Long start_time) {
+    public void setStart_time(long start_time) {
         this.start_time = start_time;
     }
 
-    public void setEnd_time(Long end_time) {
+    public void setEnd_time(long end_time) {
         this.end_time = end_time;
     }
 
-    public void setDuration(Long duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 
-    public void setStart_lat(Double start_lat) {
+    public void setStart_lat(double start_lat) {
         this.start_lat = start_lat;
     }
 
-    public void setStart_long(Double start_long) {
+    public void setStart_long(double start_long) {
         this.start_long = start_long;
     }
 
-    public void setEnd_lat(Double end_lat) {
+    public void setEnd_lat(double end_lat) {
         this.end_lat = end_lat;
     }
 
-    public void setEnd_long(Double end_long) {
+    public void setEnd_long(double end_long) {
         this.end_long = end_long;
     }
 
@@ -118,11 +118,11 @@ public class Trip {
         this.categories = categories;
     }
 
-    public void setMiles(Double miles) {
+    public void setMiles(double miles) {
         this.miles = miles;
     }
 
-    public void setCost(Double cost) {
+    public void setCost(double cost) {
         this.cost = cost;
     }
 }

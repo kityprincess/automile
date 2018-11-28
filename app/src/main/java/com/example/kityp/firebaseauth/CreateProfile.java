@@ -10,6 +10,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,8 +29,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.Date;
@@ -37,41 +41,52 @@ import java.util.Date;
 public class CreateProfile extends AppCompatActivity implements View.OnClickListener {
 
     TextView textView;
-    EditText editText;
+    EditText displayName_editText;
+    EditText emailAddress_editText;
     ProgressBar progressBar;
 
     FirebaseAuth mAuth;
+    private DatabaseReference databaseProfile;
+    private DatabaseReference databaseName;
+    private DatabaseReference databaseEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_profile);
+
         mAuth = FirebaseAuth.getInstance();
+        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseProfile = FirebaseDatabase.getInstance().getReference("profiles")
+                .child(user_uid);
+        databaseName = databaseProfile.child("displayName");
+        databaseEmail = databaseProfile.child("emailAdress");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        editText = (EditText) findViewById(R.id.DisplayName_editText);
+        displayName_editText = (EditText) findViewById(R.id.displayName_editText);
+        emailAddress_editText = (EditText) findViewById(R.id.emailAddress_editText);
         progressBar = (ProgressBar) findViewById(R.id.progressbar);
 
-        Button WrkHours_button = findViewById(R.id.WrkHours_button);
-        Button Categories_button = findViewById(R.id.Categories_button);
-        Button PauseTime_button = findViewById(R.id.PauseTime_button);
-        Button ScheduleReports_button = findViewById(R.id.ScheduleReports_button);
+        Button wrkHours_button = findViewById(R.id.wrkHours_button);
+        Button categories_button = findViewById(R.id.categories_button);
+        Button pauseTime_button = findViewById(R.id.pauseTime_button);
+//        Button scheduleReports_button = findViewById(R.id.scheduleReports_button);
 
         loadUserInformation();
 
-        findViewById(R.id.Save_button).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 saveUserInformation();
             }
         });
 // TODO: Add hints or instructions to each setting below
-        WrkHours_button.setOnClickListener(this);
-        Categories_button.setOnClickListener(this);
-        PauseTime_button.setOnClickListener(this);
-        ScheduleReports_button.setOnClickListener(this);
+        wrkHours_button.setOnClickListener(this);
+        categories_button.setOnClickListener(this);
+        pauseTime_button.setOnClickListener(this);
+//        scheduleReports_button.setOnClickListener(this);
     }
 
 
@@ -85,62 +100,98 @@ public class CreateProfile extends AppCompatActivity implements View.OnClickList
     }
 
     private void loadUserInformation() {
-        final FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            if (user.getDisplayName() != null) {
-                editText.setText(user.getDisplayName());
+        databaseName.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String displayName = dataSnapshot.getValue(String.class);
+                Log.e("EventListener", "Display Name" + displayName);
+                displayName_editText.setText(displayName);
             }
-        }
-    }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        databaseEmail.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String emailAddress = dataSnapshot.getValue(String.class);
+                Log.e("EventListener", "Display Name" + emailAddress);
+                emailAddress_editText.setText(emailAddress);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+//        if (user != null) {
+//            if (user.getDisplayName() != null) {
+//                displayName_editText.setText(user.getDisplayName());
+//            }
+//        }
+    }
 
     private void saveUserInformation() {
 
-        String displayName = editText.getText().toString();
+        String newDisplayName = displayName_editText.getText().toString().trim();
+        String newEmailAddress = emailAddress_editText.getText().toString().trim();
 
-        if (displayName.isEmpty()) {
-            editText.setError("Name required");
-            editText.requestFocus();
+        if (newDisplayName.isEmpty()) {
+            displayName_editText.setError("Name required");
+            displayName_editText.requestFocus();
             return;
+        } else {
+            databaseName.setValue(newDisplayName).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(CreateProfile.this, "Name Updated", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(CreateProfile.this, "Error updating Name", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
 
-        FirebaseUser user = mAuth.getCurrentUser();
-
-        if (user != null) {
-            UserProfileChangeRequest profile = new UserProfileChangeRequest.Builder()
-                    .setDisplayName(displayName)
-                    .build();
-
-            user.updateProfile(profile)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Toast.makeText(CreateProfile.this, "Profile Updated", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+        if (newEmailAddress.isEmpty()) {
+            emailAddress_editText.setError("Email Address required");
+            emailAddress_editText.requestFocus();
+            return;
+        } else {
+            databaseEmail.setValue(newEmailAddress).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(CreateProfile.this, "Email Updated", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(CreateProfile.this, "Error updating Email", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         }
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.WrkHours_button:
+            case R.id.wrkHours_button:
                 Toast.makeText(this, "Work Hours Button Clicked", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.Categories_button:
+            case R.id.categories_button:
                 //Toast.makeText(this, "Go To Categories Activity", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, CategoriesActivity.class));
                 break;
-            case R.id.PauseTime_button:
+            case R.id.pauseTime_button:
                 //Toast.makeText(this, "Pause Time Button Clicked", Toast.LENGTH_SHORT).show();
                 startActivity(new Intent(this, PauseTimeActivity.class));
                 break;
-            case R.id.ScheduleReports_button:
-                Toast.makeText(this, "Schedule Reports Button Clicked", Toast.LENGTH_SHORT).show();
-                break;
+//            case R.id.scheduleReports_button:
+//                Toast.makeText(this, "Schedule Reports Button Clicked", Toast.LENGTH_SHORT).show();
+//                break;
         }
 
     }

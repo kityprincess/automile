@@ -91,37 +91,6 @@ public class Home extends AppCompatActivity {
 
         }
 
-//    private void addNewTrip() {
-//        //TODO: all default values should be mull except uid
-//            String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-//            Double cost = 54.5;
-//
-//            databaseGPS = FirebaseDatabase.getInstance().getReference("gps");
-//
-//            //TODO remove - for debugging purposes only
-//            Log.e("Home Activity", "addNewTrip called");
-//
-//            Trip trip = new Trip(cost);
-//
-//            final String key = databaseGPS.child(user_uid).push().getKey();
-//            databaseGPS.child(user_uid).push().setValue(trip).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                @Override
-//                public void onComplete(@NonNull Task<Void> task) {
-//                    if (task.isSuccessful()) {
-//
-//                        Intent intent = new Intent(Home.this, GPSTracking.class);
-//                        intent.putExtra("KEY", key);
-//                        startActivity(intent);
-//
-//                        startGPSTracking();
-//                        Toast.makeText(Home.this, "Trip Started", Toast.LENGTH_SHORT).show();
-//
-//                    } else {
-//                        Toast.makeText(Home.this, "Problem Starting Trip", Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//            });
-//        }
     private void startGPSTracking() {
             startService(new Intent(this, GPSTracking.class));
         }

@@ -42,19 +42,28 @@ public class GPSTracking extends Service {
 
 //    Intent intent = getIntent();
 
+    //get user ID from authentication
     String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    //gets current GPS DB record
     DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps").child(user_uid);
+    //gets current profile DB record
+    DatabaseReference databaseProfile = FirebaseDatabase.getInstance().getReference("profiles").child(user_uid);
 
-    String key = null;
-    Double curLat = null;
-    Double curLong = null;
-    Long curTime = null;
-    Double startLat = null;
-    Double startLong = null;
-    Long startTime = null;
-    Double endLat = null;
-    Double endLong = null;
-    Long endTime = null;
+    String key;
+    double curLat = 0;
+    double curLong = 0;
+    long curTime = 0;
+    double startLat = 0;
+    double startLong;
+    long startTime;
+    double endLat;
+    double endLong;
+    long endTime;
+    double cost;
+    double mileage_rate;
+    int pause_time;
+    int count;
+    long duration;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -64,6 +73,24 @@ public class GPSTracking extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        databaseProfile.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                mileage_rate = dataSnapshot.child("mileage_rate").getValue(double.class);
+                Log.e("Profile DB Listener", "Mileage Rate: " + mileage_rate);
+
+                pause_time = dataSnapshot.child("pause_time").getValue(int.class);
+                pause_time = pause_time--;
+                Log.e("Profile DB Listener", "Pause Time: " + pause_time);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
         callPermissions();
     }
 
@@ -88,20 +115,23 @@ public class GPSTracking extends Service {
 
     private void addNewTrip() {
         //TODO: all default values should be mull except uid
-        String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Double cost = 54.5;
+        //String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        double cost = 54.5;
 
         //TODO remove - for debugging purposes only
         Log.e("GPSTracking Activity", "addNewTrip called");
 
-        Trip trip = new Trip(cost);
+        Trip trip = new Trip(mileage_rate);
 
+        key = databaseGPS.push().getKey();
+        Log.e("addNewTrip", "key: " + key);
 
-        databaseGPS.push().setValue(trip).addOnCompleteListener(new OnCompleteListener<Void>() {
+        databaseGPS.child(key).setValue(trip).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    key = databaseGPS.push().getKey();
+                    //key = databaseGPS.getKey();
+
                     Toast.makeText(GPSTracking.this, "Trip Started", Toast.LENGTH_SHORT).show();
                     requestLocationUpdates();
 
@@ -121,29 +151,29 @@ public class GPSTracking extends Service {
 
             Log.e("GPSTracking", "requesting permission");
 
-            //60000 milliseconds = 1 second
+            //60000 milliseconds = 1 minute
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
             locationRequest.setFastestInterval(60000);
             locationRequest.setInterval(60000);
 
-            databaseGPS.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    startLat = dataSnapshot.child(key).child("start_lat").getValue(Double.class);
-
-                    Log.e("Location", "Listener Starting Latitude: " + startLat);
-                    Log.e("Location", "Listener Starting Longitude: " + startLong);
-                    Log.e("Location", "Listener Current Latitude: " + curLat);
-                    Log.e("Location", "Listener Current Longitutde: " + curLong);
-                    Log.e("Location", "Listener Current Time: " + curTime);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+//            databaseGPS.addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    startLat = dataSnapshot.child(key).child("start_lat").getValue(double.class);
+//
+//                    Log.e("Location", "Listener Starting Latitude: " + startLat);
+//                    Log.e("Location", "Listener Starting Longitude: " + startLong);
+//                    Log.e("Location", "Listener Current Latitude: " + curLat);
+//                    Log.e("Location", "Listener Current Longitutde: " + curLong);
+//                    Log.e("Location", "Listener Current Time: " + curTime);
+//                }
+//
+//                @Override
+//                public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                }
+//            });
 
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, new LocationCallback() {
                 @Override
@@ -159,24 +189,43 @@ public class GPSTracking extends Service {
                     Log.e("Location", "locationResult Current Latitude: " + curLat);
                     Log.e("Location", "locationResult Current Longitutde: " + curLong);
 
-                    //TODO at starting Longitude after figuring out why it's taking a value too early
-                    if (curLat != null && curLong != null && startLat == null) {
-                        Log.e("Location", "Are we even making it through the ifs ands buts");
-                        databaseGPS.child(key).child("start_lat").setValue(startLat);
-                        databaseGPS.child(key).child("start_long").setValue(startLong);
-                        databaseGPS.child(key).child("start_time").setValue(startTime);
-                        databaseGPS.child(key).child("end_lat").setValue(endLat);
-                        databaseGPS.child(key).child("end_long").setValue(endLong);
-                        databaseGPS.child(key).child("end_time").setValue(endTime);
-                        startLat = curLat;
-                        startLong = curLong ;
-                        startTime = curTime;
+                    //starting a trip - start & end values are null
+                    if (curLat != 0 && curLong != 0 && startLat == 0 && startLong == 0) {
+                        Log.e("Location", "Just starting trip");
 
-                        Log.e("Location", "First write Starting Latitude: " + startLat);
-                        Log.e("Location", "First write Starting Longitutde: " + startLong);
-                        Log.e("Location", "First write Current Latitude: " + curLat);
-                        Log.e("Location", "First write Current Longitutde: " + curLong);
-                        Log.e("Location", "First write Current Time: " + curTime);
+                        updateStartpoint();
+                        updateEndpoint();
+                        return;
+                    }
+
+                    //pause time reached - close the trip and complete calculations
+                    if ((curLat == endLat || curLong == endLong) && count == pause_time) {
+                        updatedEndTime();
+
+                        duration = endTime - startTime;
+                        databaseGPS.child(key).child("duration").setValue(duration);
+                        Log.e("Location", "Ending a trip");
+                        Log.e("Location", "Duration: " + duration);
+                        initializeTrip();
+                        stopGPSTracking();
+                        return;
+                    }
+
+                    //driving paused but pause time not reached - update pause time & increment count
+                    if ((curLat == endLat || curLong == endLong) && count < pause_time) {
+                        Log.e("Location", "trip paused");
+                        updatedEndTime();
+                        count++;
+                        return;
+                    }
+
+                    //trip started but driving not paused - update ends
+                    if ((curLat != startLat || curLong != startLong || curLat != endLat || curLong != endLong) && endTime != 0) {
+                        Log.e("Location", "driving");
+                        if (curLat == endLat) { Log.e("Driving", "curLat == endLat"); };
+                        count = 0;
+                        updateEndpoint();
+                        return;
                     }
 
                     //TODO Remove - debugging only
@@ -207,8 +256,66 @@ public class GPSTracking extends Service {
                 callPermissions();
             }
         });
-
     }
+
+    public void updateStartpoint() {
+        startLat = curLat;
+        startLong = curLong ;
+        startTime = curTime;
+
+        databaseGPS.child(key).child("start_lat").setValue(startLat);
+        databaseGPS.child(key).child("start_long").setValue(startLong);
+        databaseGPS.child(key).child("start_time").setValue(startTime);
+
+        Log.e("Location", " Update Start Point called: " + count);
+        Log.e("Location", count + " write Starting Latitude: " + startLat);
+        Log.e("Location", count + " write Starting Longitutde: " + startLong);
+    }
+
+    public void updateEndpoint() {
+        endLat = curLat;
+        endLong = curLong;
+        endTime = curTime;
+
+        Log.e("Location", " Update End Point called: " + count);
+        databaseGPS.child(key).child("end_lat").setValue(endLat);
+        databaseGPS.child(key).child("end_long").setValue(endLong);
+        databaseGPS.child(key).child("end_time").setValue(endTime);
+
+        Log.e("Location", count + " Ending Latitude: " + endLat);
+        Log.e("Location", count + " Ending Longitute: " + endLong);
+        Log.e("Location", count + " Ending Time: " + endTime);
+    }
+
+    private void updatedEndTime() {
+        endTime = curTime;
+        databaseGPS.child(key).child("end_time").setValue(endTime);
+        Log.e("Location", count + " Ending Time: " + endTime);
+    }
+
+    private void initializeTrip() {
+        key = null;
+        curLat = 0;
+        curLong = 0;
+        curTime = 0;
+        startLat = 0;
+        startLong = 0;
+        startTime = 0;
+        endLat = 0;
+        endLong = 0;
+        endTime = 0;
+        cost = 0;
+        mileage_rate = 0;
+        pause_time = 0;
+        count = 0;
+        duration = 0;
+    }
+
+    private void stopGPSTracking() {
+        //TODO this isn't stopping the service
+        stopService(new Intent(this, GPSTracking.class));
+        Toast.makeText(GPSTracking.this, "Trip Recorded", Toast.LENGTH_SHORT).show();
+        Log.e("Stop GPS Tracking", "Tracking Stopped");
+    }
+
 }
-
-
