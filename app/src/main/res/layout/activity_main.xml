@@ -12,12 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="1">
 
-        <ImageView
-            android:layout_width="85dp"
-            android:layout_height="100dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/ic_launcher_background"/>
     </RelativeLayout>
 
     <RelativeLayout
@@ -61,10 +55,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="7dp"
-            android:background="@drawable/common_google_signin_btn_icon_light_normal"
+            android:background="@color/colorAccent2"
             android:text="Login"
             android:textAllCaps="false"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/colorAccent" />
 
         <TextView
             android:id="@+id/register_textView"

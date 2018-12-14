@@ -19,8 +19,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
@@ -30,8 +33,11 @@ public class Home extends AppCompatActivity {
 
     TextView textView;
 
-    DatabaseReference databaseProfile;
-    DatabaseReference databaseGPS;
+    //get user ID from authentication
+    String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+    //gets current GPS DB record
+    DatabaseReference databaseGPS = FirebaseDatabase.getInstance().getReference("gps").child(user_uid);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +51,6 @@ public class Home extends AppCompatActivity {
 
         Button start_button = (Button) findViewById(R.id.start_button);
         Button stop_button = (Button) findViewById(R.id.stop_button);
-        textView = (TextView) findViewById(R.id.textView);
 
 
         findViewById(R.id.start_button).setOnClickListener(new View.OnClickListener() {
@@ -61,6 +66,7 @@ public class Home extends AppCompatActivity {
                 stopGPSTracking();
             }
         });
+
     }
 
 

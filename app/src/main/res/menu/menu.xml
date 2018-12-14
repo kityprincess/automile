@@ -5,6 +5,9 @@
         android:id="@+id/menuProfile"
         android:title="Profile" />
     <item
+        android:id="@+id/menuHome"
+        android:title="Trips" />
+    <item
         android:id="@+id/menuLogout"
         android:title="Logout" />
 

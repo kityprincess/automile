@@ -210,7 +210,10 @@ public class CreateProfile extends AppCompatActivity implements View.OnClickList
 
         switch (item.getItemId()) {
             case R.id.menuProfile:
-                Intent intent = new Intent(this, CreateProfile.class);
+                Intent intentProfile = new Intent(this, CreateProfile.class);
+                break;
+            case R.id.menuHome:
+                startActivity(new Intent(this, Home.class));
                 break;
             case R.id.menuLogout:
                 FirebaseAuth.getInstance().signOut();

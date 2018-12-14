@@ -30,7 +30,8 @@
             android:enabled="true"
             android:exported="true" />
 
-        <activity android:name=".Home"></activity>
+        <activity android:name=".Home" />
+        <activity android:name=".deleteme"></activity>
     </application>
 
 </manifest>

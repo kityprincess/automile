@@ -38,7 +38,6 @@ import java.util.Map;
 
 public class CategoriesActivity extends AppCompatActivity {
 
-    ProgressBar progressBar;
     EditText category_editText;
     Button addCategory_button;
     Spinner categories_spinner;
@@ -54,6 +53,7 @@ public class CategoriesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_categories);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -166,7 +166,10 @@ public class CategoriesActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.menuProfile:
-                Intent intent = new Intent(this, CreateProfile.class);
+                startActivity(new Intent(this, CreateProfile.class));
+                break;
+            case R.id.menuHome:
+                startActivity(new Intent(this, Home.class));
                 break;
             case R.id.menuLogout:
                 FirebaseAuth.getInstance().signOut();
@@ -177,5 +180,4 @@ public class CategoriesActivity extends AppCompatActivity {
 
         return true;
     }
-
 }

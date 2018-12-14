@@ -30,7 +30,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PauseTimeActivity extends AppCompatActivity {
 
-    ProgressBar progressBar;
     EditText pauseTime_editText;
     Button updatePauseTime_button;
     TextView pauseTime_textView;
@@ -43,6 +42,7 @@ public class PauseTimeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_pause_time);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         String user_uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -57,7 +57,7 @@ public class PauseTimeActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int pauseTime = dataSnapshot.getValue(int.class);
-                pauseTime_textView.setText("Pause Time: " + pauseTime);
+                pauseTime_textView.setText("Current Pause Time: " + pauseTime);
             }
 
             @Override
@@ -108,7 +108,10 @@ public class PauseTimeActivity extends AppCompatActivity {
 
         switch (item.getItemId()) {
             case R.id.menuProfile:
-                Intent intent = new Intent(this, CreateProfile.class);
+                startActivity(new Intent(this, CreateProfile.class));
+                break;
+            case R.id.menuHome:
+                startActivity(new Intent(this, Home.class));
                 break;
             case R.id.menuLogout:
                 FirebaseAuth.getInstance().signOut();
@@ -116,6 +119,7 @@ public class PauseTimeActivity extends AppCompatActivity {
                 startActivity(new Intent(this, MainActivity.class));
                 break;
         }
+
         return true;
     }
 }

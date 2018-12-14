@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     tools:context=".CreateProfile">
 
     <android.support.v7.widget.Toolbar
@@ -24,14 +25,13 @@
         android:layout_height="wrap_content"
         android:hint="Enter Email Address" />
 
-    <!--TODO: Pick a different button-->
     <Button
         android:id="@+id/wrkHours_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorAccent"
         android:paddingLeft="55dp"
         android:paddingRight="55dp"
         android:text="Working Hours"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorAccent"
         android:paddingLeft="55dp"
         android:paddingRight="55dp"
         android:text="Categories"
@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:background="@color/colorPrimary"
+        android:background="@color/colorAccent"
         android:paddingLeft="55dp"
         android:paddingRight="55dp"
         android:text="Pause Time"
@@ -79,7 +79,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="25dp"
-        android:background="@drawable/common_google_signin_btn_icon_dark_normal"
+        android:background="@color/colorAccent2"
         android:paddingLeft="55dp"
         android:paddingRight="55dp"
         android:text="Save"

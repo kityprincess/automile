@@ -14,19 +14,19 @@
 
     <Button
         android:id="@+id/start_button"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Trip" />
+        android:background="@color/colorAccent"
+        android:text="Start Trip"
+        android:textSize="18sp" />
 
     <Button
         android:id="@+id/stop_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Stop Trip" />
+        android:background="@color/colorAccent"
+        android:text="Stop Trip"
+        android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="This is a test... only a test." />
 </LinearLayout>
